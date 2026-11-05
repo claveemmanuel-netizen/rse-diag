@@ -1,0 +1,16 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/assets/*", "/icons/*", "/*.{png,jpg,jpeg,svg,ico,webmanifest,json,js,css,txt,map}"]
+  },
+  "routes": [
+    { "route": "/sw.js", "headers": { "cache-control": "no-cache" } },
+    { "route": "/registerSW.js", "headers": { "cache-control": "no-cache" } },
+    { "route": "/manifest.webmanifest", "headers": { "cache-control": "no-cache" } }
+  ],
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "camera=(self), microphone=(self), geolocation=(self)"
+  }
+}

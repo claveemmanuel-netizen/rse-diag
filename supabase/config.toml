@@ -1,0 +1,9 @@
+# Configuration du CLI Supabase (développement local et déploiement des fonctions).
+# Le projet hébergé se configure dans le tableau de bord Supabase (voir README).
+project_id = "rse-diag"
+
+[functions.brouillon-diagnostic]
+# L'appel exige un utilisateur connecté (en plus de la vérification faite dans la fonction).
+verify_jwt = true
+# Fichier de prompt embarqué avec la fonction au déploiement.
+static_files = ["./functions/brouillon-diagnostic/prompt-redaction.md"]

@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-slate-100 text-base text-slate-900 antialiased;
+    overscroll-behavior-y: none;
+  }
+  button,
+  [role='button'],
+  summary {
+    touch-action: manipulation;
+  }
+  /* Contour de focus très visible (clavier, lecteur d'écran, tablette avec clavier). */
+  :focus-visible {
+    @apply outline outline-4 outline-offset-2 outline-amber-500;
+  }
+}
+
+@layer components {
+  .bouton {
+    @apply inline-flex min-h-tactile select-none items-center justify-center gap-2 rounded-xl px-5 py-3 text-lg font-bold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .bouton-primaire {
+    @apply bouton bg-vert-700 text-white shadow-sm hover:bg-vert-800 active:bg-vert-900;
+  }
+  .bouton-secondaire {
+    @apply bouton border-2 border-vert-700 bg-white text-vert-800 hover:bg-vert-50;
+  }
+  .bouton-neutre {
+    @apply bouton border-2 border-slate-300 bg-white text-slate-900 hover:bg-slate-50;
+  }
+  .bouton-danger {
+    @apply bouton border-2 border-red-700 bg-white text-red-800 hover:bg-red-50;
+  }
+  .carte {
+    @apply rounded-2xl border border-slate-300 bg-white p-4 shadow-sm;
+  }
+  .champ {
+    @apply min-h-tactile w-full rounded-xl border-2 border-slate-400 bg-white px-4 py-3 text-lg text-slate-900 placeholder:text-slate-500;
+  }
+  .etiquette {
+    @apply mb-1 block text-base font-semibold text-slate-800;
+  }
+}
+
+/* Marge de sécurité pour les téléphones à encoche / barre de gestes. */
+.pied-securise {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.75rem);
+}

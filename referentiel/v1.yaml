@@ -1,0 +1,617 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  RÉFÉRENTIEL DU DIAGNOSTIC RSE DES ESPACES EXTÉRIEURS — VERSION 1
+#  Ce fichier se modifie SANS coder : voir le README (section « Modifier le
+#  référentiel »). Après modification, lancer « npm test » pour le valider.
+#  Une visite mémorise la version du référentiel utilisée : pour faire évoluer
+#  les questions, copier ce fichier en v2.yaml et changer « version ».
+# ═══════════════════════════════════════════════════════════════════════════
+#
+#  AIDE-MÉMOIRE
+#  libelleCourt  : (pilier) intitulé abrégé affiché sur les axes du radar (30 caractères max)
+#  type          : bool (Oui/Non/Partiel/Ne sait pas) | choix | nombre | texte | photo | date
+#  poids         : importance de la question dans le score du pilier (0 = non notée)
+#  score (bool)  : points (0-100) par réponse ; par défaut oui=100, partiel=50, non=0
+#                  « ne sait pas » et « sans objet » ne comptent jamais dans le score.
+#  score (choix) : un 'score' par option ; 'multiple: true' = plusieurs réponses possibles,
+#                  agrégées par 'agregat' (somme plafonnée à 100 par défaut, max, moyenne, min).
+#  score (nombre): 'tranches' classées par 'jusqua' (borne haute incluse), la dernière sans borne.
+#  afficherSi    : n'affiche la question que si une réponse précédente est dans 'dans' / hors 'sauf'.
+#  piste         : amélioration proposée si la réponse est mauvaise (alimente les « quick wins »).
+#  prestation    : lien vers une prestation de la liste « prestations » (suite commerciale).
+#  cleExport     : nom de colonne dans l'export Excel/CSV (questions de qualification surtout).
+
+version: "1.0.0"
+nom: "Diagnostic RSE des espaces extérieurs — référentiel V1"
+
+niveaux:
+  - { id: debutant, libelle: "Débutant", min: 0, couleur: "#b91c1c", description: "Les espaces extérieurs sont peu valorisés : beaucoup de gains rapides sont possibles." }
+  - { id: en_progression, libelle: "En progression", min: 40, couleur: "#b45309", description: "Des bonnes pratiques existent mais restent partielles ou non structurées." }
+  - { id: avance, libelle: "Avancé", min: 65, couleur: "#4d7c0f", description: "Une démarche solide, à consolider et à valoriser." }
+  - { id: exemplaire, libelle: "Exemplaire", min: 85, couleur: "#14532d", description: "Les espaces extérieurs sont un véritable atout RSE de l'entreprise." }
+
+quickWins:
+  max: 5            # nombre de pistes prioritaires retenues
+  seuil: 50         # une réponse notée sous ce seuil (sur 100) devient une piste d'amélioration
+  maxParPilier: 2   # évite que tous les quick wins viennent du même pilier
+
+pointsForts:
+  max: 5
+  seuil: 80         # une réponse notée à partir de ce seuil est un point fort
+
+prestations:
+  - { id: gestion_differenciee, libelle: "Gestion différenciée et fauche tardive", description: "Plan de gestion adapté zone par zone : tontes raisonnées, prairies, fauches tardives." }
+  - { id: plantation_haies, libelle: "Plantation de haies champêtres", description: "Haies d'essences locales variées, favorables aux oiseaux et aux insectes." }
+  - { id: strates_vegetales, libelle: "Diversification des strates végétales", description: "Création de strates herbacée, arbustive et arborée." }
+  - { id: abris_faune, libelle: "Nichoirs, hôtels à insectes et gîtes", description: "Fourniture et pose d'abris pour la faune locale." }
+  - { id: creation_mare_noue, libelle: "Création de mare, noue ou jardin de pluie", description: "Point d'eau naturel et gestion des eaux pluviales." }
+  - { id: lutte_invasives, libelle: "Gestion des espèces exotiques envahissantes", description: "Repérage, arrachage et plan de suivi." }
+  - { id: prairie_fleurie, libelle: "Prairies fleuries et plantes mellifères", description: "Semis et plantations favorables aux pollinisateurs." }
+  - { id: desimpermeabilisation, libelle: "Désimperméabilisation et revêtements perméables", description: "Retrait d'enrobé, dalles alvéolées, stabilisé drainant." }
+  - { id: recuperation_eau, libelle: "Récupération d'eau de pluie et arrosage raisonné", description: "Cuves, goutte-à-goutte, programmation, sondes d'humidité." }
+  - { id: paillage_couvre_sol, libelle: "Paillage et couvre-sols", description: "Protection des sols, limitation de l'arrosage et du désherbage." }
+  - { id: zero_phyto, libelle: "Passage au zéro phyto", description: "Techniques alternatives de désherbage et de fertilisation." }
+  - { id: valorisation_dechets_verts, libelle: "Broyage et compostage des déchets verts sur site", description: "Boucle courte : paillage et amendement produits sur place." }
+  - { id: materiel_electrique, libelle: "Entretien au matériel électrique", description: "Moins de bruit, d'émissions et de nuisances pour les occupants." }
+  - { id: eclairage_raisonne, libelle: "Éclairage extérieur raisonné", description: "Extinction nocturne, orientation et température de couleur adaptées." }
+  - { id: ombrage_arbres, libelle: "Plantation d'arbres d'ombrage", description: "Ombrage des parkings et zones de pause, rafraîchissement du site." }
+  - { id: vegetalisation_batiment, libelle: "Végétalisation de façades et toitures", description: "Toitures végétalisées, murs végétaux, plantes grimpantes." }
+  - { id: espace_pause, libelle: "Aménagement d'espaces de pause extérieurs", description: "Mobilier, abris, cheminements et ambiance végétale." }
+  - { id: acces_pmr, libelle: "Mise en accessibilité des espaces extérieurs", description: "Cheminements et mobilier adaptés aux personnes à mobilité réduite." }
+  - { id: potager_animations, libelle: "Potager partagé et animations nature", description: "Création et animation de jardins partagés, ateliers, ruches." }
+  - { id: mobilite_douce, libelle: "Équipements de mobilité douce", description: "Abris vélos, implantation de bornes de recharge." }
+  - { id: accompagnement_rse, libelle: "Accompagnement RSE et valorisation", description: "Plan d'action, indicateurs, contribution au rapport RSE, labels." }
+  - { id: contrat_responsable, libelle: "Contrat d'entretien responsable", description: "Contrat d'entretien intégrant des objectifs écologiques et un suivi." }
+
+zones:
+  types:
+    - { id: pelouse, libelle: "Pelouse", icone: "🌱" }
+    - { id: massif, libelle: "Massif / plates-bandes", icone: "🌸" }
+    - { id: haie, libelle: "Haie", icone: "🌿" }
+    - { id: arbres, libelle: "Arbres", icone: "🌳" }
+    - { id: parking, libelle: "Parking", icone: "🅿️" }
+    - { id: toiture, libelle: "Toiture", icone: "🏢" }
+    - { id: point_eau, libelle: "Point d'eau", icone: "💧" }
+    - { id: friche, libelle: "Friche / prairie", icone: "🌾" }
+    - { id: potager, libelle: "Potager", icone: "🥕" }
+    - { id: terrasse, libelle: "Terrasse / espace de pause", icone: "🪑" }
+    - { id: cheminement, libelle: "Allées / cheminements", icone: "🚶" }
+    - { id: autre, libelle: "Autre", icone: "📍" }
+  etats:
+    - { id: bon, libelle: "Bon" }
+    - { id: moyen, libelle: "Moyen" }
+    - { id: mauvais, libelle: "Mauvais" }
+  tailles:            # utilisées pour estimer les surfaces quand on ne saisit pas de m²
+    - { id: petit, libelle: "Petit (< 100 m²)", m2Indicatif: 50 }
+    - { id: moyen, libelle: "Moyen (100 à 500 m²)", m2Indicatif: 250 }
+    - { id: grand, libelle: "Grand (> 500 m²)", m2Indicatif: 1000 }
+
+sections:
+  # ───────────────────────────── QUALIFICATION COMMERCIALE (non notée) ─────
+  - id: qualification
+    libelle: "Qualification commerciale"
+    type: qualification
+    icone: "🤝"
+    description: "À remplir en début de visite : qui décide, qui paie, où en est l'entretien aujourd'hui."
+    questions:
+      - id: q_statut_occupation
+        libelle: "Statut d'occupation du site"
+        type: choix
+        cleExport: statut_occupation
+        pourquoi: "Beaucoup de prospects sont locataires : le décideur et le payeur de l'entretien ne sont alors pas toujours l'interlocuteur rencontré."
+        options:
+          - { valeur: proprietaire, libelle: "Propriétaire occupant" }
+          - { valeur: locataire, libelle: "Locataire" }
+          - { valeur: copropriete, libelle: "Copropriété" }
+          - { valeur: multi_locataires_pm, libelle: "Multi-locataires avec property manager" }
+      - id: q_decideur
+        libelle: "Qui décide de l'entretien des espaces extérieurs ?"
+        type: choix
+        cleExport: decideur
+        pourquoi: "Identifier le vrai décideur évite de présenter une offre à quelqu'un qui ne peut pas la signer."
+        options:
+          - { valeur: interlocuteur, libelle: "Mon interlocuteur / l'entreprise" }
+          - { valeur: bailleur, libelle: "Le bailleur / propriétaire" }
+          - { valeur: syndic, libelle: "Le syndic" }
+          - { valeur: property_manager, libelle: "Le property manager" }
+          - { valeur: autre, libelle: "Autre" }
+          - { valeur: nsp, libelle: "Ne sait pas" }
+      - id: q_payeur
+        libelle: "Qui paie l'entretien des espaces extérieurs ?"
+        type: choix
+        cleExport: payeur
+        options:
+          - { valeur: interlocuteur, libelle: "L'entreprise (budget propre)" }
+          - { valeur: charges_bailleur, libelle: "Le bailleur (charges refacturées)" }
+          - { valeur: charges_copro, libelle: "La copropriété (charges de copropriété)" }
+          - { valeur: property_manager, libelle: "Le property manager" }
+          - { valeur: nsp, libelle: "Ne sait pas" }
+      - id: q_decideur_nom
+        libelle: "Nom du décideur (si différent de l'interlocuteur)"
+        type: texte
+        cleExport: decideur_nom
+        afficherSi: { question: q_decideur, sauf: [interlocuteur] }
+      - id: q_decideur_organisation
+        libelle: "Société du décideur (bailleur, syndic, property manager…)"
+        type: texte
+        cleExport: decideur_organisation
+        afficherSi: { question: q_decideur, sauf: [interlocuteur] }
+      - id: q_decideur_coordonnees
+        libelle: "Coordonnées du décideur (email, téléphone)"
+        type: texte
+        cleExport: decideur_coordonnees
+        afficherSi: { question: q_decideur, sauf: [interlocuteur] }
+      - id: q_entretien_actuel
+        libelle: "Entretien actuel des espaces extérieurs"
+        type: choix
+        cleExport: entretien_actuel
+        options:
+          - { valeur: interne, libelle: "En interne" }
+          - { valeur: prestataire, libelle: "Par un prestataire" }
+          - { valeur: aucun, libelle: "Aucun entretien" }
+      - id: q_prestataire_nom
+        libelle: "Nom du prestataire actuel"
+        type: texte
+        cleExport: prestataire_nom
+        afficherSi: { question: q_entretien_actuel, dans: [prestataire] }
+      - id: q_contrat_fin
+        libelle: "Date de fin du contrat actuel"
+        type: date
+        cleExport: contrat_fin
+        pourquoi: "Permet de planifier la relance au bon moment, avant le renouvellement ou l'appel d'offres."
+        afficherSi: { question: q_entretien_actuel, dans: [prestataire] }
+      - id: q_frequence
+        libelle: "Fréquence de passage"
+        type: choix
+        cleExport: frequence_passage
+        afficherSi: { question: q_entretien_actuel, dans: [prestataire, interne] }
+        options:
+          - { valeur: hebdomadaire, libelle: "Chaque semaine" }
+          - { valeur: bimensuel, libelle: "2 fois par mois" }
+          - { valeur: mensuel, libelle: "1 fois par mois" }
+          - { valeur: saisonnier, libelle: "Quelques fois par an" }
+          - { valeur: demande, libelle: "À la demande" }
+      - id: q_satisfaction
+        libelle: "Niveau de satisfaction vis-à-vis de l'entretien actuel"
+        type: nombre
+        cleExport: satisfaction
+        unite: "/ 5"
+        min: 1
+        max: 5
+        pas: 1
+        affichage: curseur
+        pourquoi: "1 = très insatisfait, 5 = très satisfait. Un score bas signale une opportunité de changement de prestataire."
+        afficherSi: { question: q_entretien_actuel, dans: [prestataire, interne] }
+      - id: q_demarche_rse
+        libelle: "Démarche RSE existante dans l'entreprise"
+        type: choix
+        cleExport: demarche_rse
+        options:
+          - { valeur: aucune, libelle: "Aucune" }
+          - { valeur: informelle, libelle: "Informelle" }
+          - { valeur: formalisee, libelle: "Formalisée" }
+          - { valeur: labellisee, libelle: "Labellisée" }
+      - id: q_labels
+        libelle: "Labels ou certifications"
+        type: choix
+        multiple: true
+        cleExport: labels
+        afficherSi: { question: q_demarche_rse, dans: [labellisee, formalisee] }
+        options:
+          - { valeur: iso14001, libelle: "ISO 14001" }
+          - { valeur: bcorp, libelle: "B Corp" }
+          - { valeur: ecovadis, libelle: "EcoVadis" }
+          - { valeur: autre, libelle: "Autre" }
+      - id: q_reporting
+        libelle: "Obligations de reporting connues"
+        type: choix
+        multiple: true
+        cleExport: reporting
+        pourquoi: "Un reporting exigé (clients, donneurs d'ordre, réglementation) est un levier fort pour proposer un accompagnement."
+        options:
+          - { valeur: demandes_clients, libelle: "Demandes de clients / donneurs d'ordre", }
+          - { valeur: reglementaire, libelle: "Obligation réglementaire (ex. CSRD)" }
+          - { valeur: autre, libelle: "Autre" }
+          - { valeur: aucune, libelle: "Aucune connue", exclusif: true }
+      - id: q_attentes
+        libelle: "Attentes exprimées par l'interlocuteur"
+        type: texte
+        multiligne: true
+        cleExport: attentes
+      - id: q_irritants
+        libelle: "Irritants exprimés par l'interlocuteur"
+        type: texte
+        multiligne: true
+        cleExport: irritants
+
+  # ───────────────────────────── PILIER 1 — BIODIVERSITÉ ─────────────────
+  - id: biodiversite
+    libelle: "Biodiversité"
+    type: pilier
+    icone: "🦋"
+    description: "Diversité du vivant sur le site : végétation, abris pour la faune, eau, espèces invasives."
+    questions:
+      - id: bio_haies_variees
+        libelle: "Les haies sont-elles variées, avec des essences locales ?"
+        type: bool
+        sansObjet: true
+        poids: 3
+        pourquoi: "Une haie variée d'essences locales offre gîte et nourriture à de nombreuses espèces, contrairement à une haie monospécifique (thuya, laurier)."
+        piste: { titre: "Diversifier les haies avec des essences locales", texte: "Compléter ou remplacer les haies monospécifiques par un mélange d'essences locales (charme, noisetier, cornouiller…).", effort: moyen }
+        prestation: plantation_haies
+      - id: bio_haies_oiseaux
+        libelle: "Les haies abritent-elles des oiseaux (nids, passages observés) ?"
+        type: bool
+        sansObjet: true
+        poids: 2
+        pourquoi: "La présence d'oiseaux est un bon indicateur de la qualité des haies."
+        piste: { titre: "Rendre les haies plus accueillantes pour les oiseaux", texte: "Adapter la période de taille (hors nidification), conserver des baies et des zones denses.", effort: faible }
+        prestation: plantation_haies
+      - id: bio_strates
+        libelle: "Quelles strates de végétation sont présentes ?"
+        type: choix
+        multiple: true
+        poids: 3
+        pourquoi: "Plus il y a de strates (herbacée, arbustive, arborée), plus le site accueille d'espèces différentes."
+        piste: { titre: "Étoffer les strates de végétation", texte: "Ajouter les strates manquantes : arbustes en bosquet, arbres de petit développement, prairie en pied.", effort: moyen }
+        prestation: strates_vegetales
+        options:
+          - { valeur: herbacee, libelle: "Herbacée (pelouse, prairie)", score: 33 }
+          - { valeur: arbustive, libelle: "Arbustive (haies, massifs)", score: 33 }
+          - { valeur: arboree, libelle: "Arborée (arbres)", score: 34 }
+          - { valeur: aucune, libelle: "Quasi aucune végétation", score: 0, exclusif: true }
+      - id: bio_gestion_differenciee
+        libelle: "Zones de prairie, fauche tardive ou gestion différenciée ?"
+        type: bool
+        poids: 3
+        pourquoi: "Tondre moins ras et moins souvent sur certaines zones favorise la flore sauvage, les pollinisateurs et réduit les coûts."
+        piste: { titre: "Mettre en place une gestion différenciée", texte: "Laisser certaines zones en prairie avec fauche tardive et conserver des tontes régulières uniquement là où l'usage l'exige.", effort: faible }
+        prestation: gestion_differenciee
+      - id: bio_abris_faune
+        libelle: "Quels abris pour la faune sont présents ?"
+        type: choix
+        multiple: true
+        poids: 2
+        pourquoi: "Nichoirs, hôtels à insectes, gîtes et tas de bois offrent des refuges pour la reproduction et l'hivernage."
+        piste: { titre: "Installer des abris pour la faune", texte: "Poser nichoirs, hôtel à insectes et gîtes à chauves-souris, et créer un tas de bois mort dans un coin tranquille.", effort: faible }
+        prestation: abris_faune
+        options:
+          - { valeur: nichoirs, libelle: "Nichoirs à oiseaux", score: 35 }
+          - { valeur: hotel_insectes, libelle: "Hôtel à insectes", score: 35 }
+          - { valeur: gites_chauves_souris, libelle: "Gîtes à chauves-souris", score: 35 }
+          - { valeur: tas_bois, libelle: "Tas de bois / de pierres", score: 35 }
+          - { valeur: aucun, libelle: "Aucun", score: 0, exclusif: true }
+      - id: bio_point_eau
+        libelle: "Point d'eau présent sur le site"
+        type: choix
+        poids: 2
+        pourquoi: "Un point d'eau naturel attire amphibiens, libellules et oiseaux, et rafraîchit l'air."
+        piste: { titre: "Créer un point d'eau naturel", texte: "Aménager une petite mare ou une noue végétalisée, avec des berges en pente douce.", effort: moyen }
+        prestation: creation_mare_noue
+        options:
+          - { valeur: aucun, libelle: "Aucun", score: 0 }
+          - { valeur: bassin, libelle: "Bassin ou fontaine ornementale", score: 40 }
+          - { valeur: noue, libelle: "Noue ou fossé végétalisé", score: 80 }
+          - { valeur: mare, libelle: "Mare naturelle", score: 100 }
+      - id: bio_invasives
+        libelle: "Des espèces invasives sont-elles repérées ? (renouée, ambroisie, buddleia, herbe de la pampa…)"
+        type: bool
+        reponses: [oui, non, nsp]
+        poids: 2
+        pourquoi: "Les espèces exotiques envahissantes banalisent les milieux et certaines sont nuisibles à la santé (ambroisie)."
+        piste: { titre: "Traiter les espèces invasives repérées", texte: "Cartographier, arracher ou contenir les espèces invasives et les remplacer par des espèces locales.", effort: moyen }
+        prestation: lutte_invasives
+        score: { oui: 0, non: 100 }
+      - id: bio_pollinisateurs
+        libelle: "Plantes mellifères ou pollinisateurs (abeilles, papillons, bourdons) observés ?"
+        type: bool
+        poids: 2
+        pourquoi: "Des fleurs sur une large période de l'année nourrissent les pollinisateurs, dont le déclin est préoccupant."
+        piste: { titre: "Planter des espèces mellifères", texte: "Semer une prairie fleurie et planter des arbustes à floraison échelonnée.", effort: faible }
+        prestation: prairie_fleurie
+
+  # ───────────────────────────── PILIER 2 — EAU ET SOLS ─────────────────
+  - id: eau_sols
+    libelle: "Eau et sols"
+    libelleCourt: "Eau et sols"
+    type: pilier
+    icone: "💧"
+    description: "Imperméabilisation, gestion des eaux de pluie, arrosage, protection des sols."
+    questions:
+      - id: eau_impermeable
+        libelle: "Part des surfaces imperméabilisées (parkings, allées, cours) — estimation"
+        type: nombre
+        unite: "%"
+        min: 0
+        max: 100
+        pas: 5
+        affichage: curseur
+        poids: 3
+        pourquoi: "Les surfaces imperméables empêchent l'eau de s'infiltrer, aggravent les ruissellements et les îlots de chaleur."
+        piste: { titre: "Désimperméabiliser une partie des surfaces", texte: "Remplacer des enrobés par des revêtements perméables ou végétalisés (dalles alvéolées, stabilisé).", effort: eleve }
+        prestation: desimpermeabilisation
+        score:
+          tranches:
+            - { jusqua: 20, score: 100 }
+            - { jusqua: 40, score: 70 }
+            - { jusqua: 60, score: 40 }
+            - { score: 0 }
+      - id: eau_pluviales
+        libelle: "Gestion des eaux pluviales"
+        type: choix
+        multiple: true
+        poids: 3
+        pourquoi: "Récupérer ou infiltrer la pluie sur place limite les rejets au réseau et fournit de l'eau gratuite pour l'arrosage."
+        piste: { titre: "Mieux gérer les eaux de pluie", texte: "Installer une cuve de récupération, une noue ou un jardin de pluie pour infiltrer sur place.", effort: moyen }
+        prestation: creation_mare_noue
+        options:
+          - { valeur: recuperation, libelle: "Récupération (cuves)", score: 40 }
+          - { valeur: noues, libelle: "Noues / jardins de pluie", score: 35 }
+          - { valeur: infiltration, libelle: "Infiltration (revêtements perméables)", score: 35 }
+          - { valeur: aucune, libelle: "Aucune gestion particulière", score: 0, exclusif: true }
+          - { valeur: nsp, libelle: "Ne sait pas", exclusif: true }
+      - id: eau_arrosage_mode
+        libelle: "Mode d'arrosage"
+        type: choix
+        poids: 2
+        pourquoi: "Un site qui ne nécessite pas d'arrosage est le plus sobre ; un arrosage automatique mal réglé est source de gaspillage."
+        options:
+          - { valeur: aucun, libelle: "Aucun arrosage", score: 100 }
+          - { valeur: manuel, libelle: "Manuel", score: 70 }
+          - { valeur: automatique, libelle: "Automatique", score: 50 }
+      - id: eau_arrosage_source
+        libelle: "Source de l'eau d'arrosage"
+        type: choix
+        poids: 2
+        afficherSi: { question: eau_arrosage_mode, dans: [manuel, automatique] }
+        pourquoi: "Arroser avec de l'eau de pluie récupérée préserve l'eau potable."
+        piste: { titre: "Arroser avec de l'eau de pluie", texte: "Raccorder l'arrosage à une cuve de récupération.", effort: moyen }
+        prestation: recuperation_eau
+        options:
+          - { valeur: recuperation, libelle: "Eau de pluie récupérée", score: 100 }
+          - { valeur: mixte, libelle: "Mixte", score: 60 }
+          - { valeur: reseau, libelle: "Réseau d'eau potable", score: 20 }
+          - { valeur: nsp, libelle: "Ne sait pas" }
+      - id: eau_arrosage_programmation
+        libelle: "L'arrosage est-il raisonné (programmation, goutte-à-goutte, sonde de pluie) ?"
+        type: bool
+        poids: 2
+        afficherSi: { question: eau_arrosage_mode, dans: [automatique] }
+        pourquoi: "Arroser tôt le matin ou la nuit, au goutte-à-goutte et avec une sonde de pluie réduit fortement la consommation."
+        piste: { titre: "Rationaliser l'arrosage automatique", texte: "Programmer la nuit, passer au goutte-à-goutte et installer une sonde de pluie ou d'humidité.", effort: faible }
+        prestation: recuperation_eau
+      - id: eau_paillage
+        libelle: "Les massifs sont-ils paillés ?"
+        type: bool
+        sansObjet: true
+        poids: 2
+        pourquoi: "Le paillage garde l'humidité, limite les herbes indésirables et nourrit le sol."
+        piste: { titre: "Pailler les massifs", texte: "Pailler avec des broyats de végétaux ou du bois raméal fragmenté (BRF), idéalement produits sur site.", effort: faible }
+        prestation: paillage_couvre_sol
+      - id: eau_sols_nus
+        libelle: "Y a-t-il des sols laissés nus (terre apparente, désherbage total) ?"
+        type: bool
+        poids: 2
+        pourquoi: "Un sol nu s'érode, se dessèche et se tasse ; un sol couvert reste vivant et fertile."
+        piste: { titre: "Couvrir les sols nus", texte: "Semer un couvre-sol, planter des vivaces couvrantes ou pailler.", effort: faible }
+        prestation: paillage_couvre_sol
+        score: { oui: 0, partiel: 50, non: 100 }
+
+  # ───────────────────────────── PILIER 3 — PRATIQUES D'ENTRETIEN ───────
+  - id: pratiques
+    libelle: "Pratiques d'entretien et ressources"
+    libelleCourt: "Pratiques"
+    type: pilier
+    icone: "🛠️"
+    description: "Produits utilisés, déchets verts, matériel, éclairage extérieur."
+    questions:
+      - id: prat_phyto
+        libelle: "Utilise-t-on des produits phytosanitaires ou des engrais chimiques ?"
+        type: bool
+        poids: 5
+        pourquoi: "Ces produits polluent l'eau, les sols et nuisent à la faune. Leur usage est encadré par la réglementation : la conformité (agrément de l'applicateur, zones concernées) est à vérifier."
+        piste: { titre: "Supprimer les produits phytosanitaires et engrais chimiques", texte: "Passer à des méthodes alternatives (désherbage mécanique, paillage, engrais organiques) et vérifier la conformité réglementaire de l'existant.", effort: moyen }
+        prestation: zero_phyto
+        score: { oui: 0, partiel: 40, non: 100 }
+      - id: prat_dechets_verts
+        libelle: "Que deviennent les déchets verts ?"
+        type: choix
+        multiple: true
+        poids: 3
+        pourquoi: "Valoriser les déchets verts sur site (broyage, compostage) évite des transports et produit paillage et compost gratuits."
+        piste: { titre: "Valoriser les déchets verts sur place", texte: "Broyer et réutiliser en paillage, installer un composteur ou un espace de compostage.", effort: faible }
+        prestation: valorisation_dechets_verts
+        options:
+          - { valeur: export, libelle: "Exportés (déchèterie, prestataire)", score: 0 }
+          - { valeur: broyage, libelle: "Broyés et réutilisés sur site", score: 50 }
+          - { valeur: compostage, libelle: "Compostés sur site", score: 50 }
+          - { valeur: nsp, libelle: "Ne sait pas", exclusif: true }
+      - id: prat_materiel
+        libelle: "Matériel d'entretien utilisé (si connu)"
+        type: choix
+        poids: 2
+        pourquoi: "Le matériel électrique réduit le bruit, les émissions de CO₂ et les nuisances pour les occupants."
+        piste: { titre: "Passer au matériel électrique", texte: "Privilégier tondeuses, taille-haies et souffleurs électriques ou à batterie.", effort: moyen }
+        prestation: materiel_electrique
+        options:
+          - { valeur: thermique, libelle: "Thermique", score: 0 }
+          - { valeur: mixte, libelle: "Mixte", score: 50 }
+          - { valeur: electrique, libelle: "Électrique / manuel", score: 100 }
+          - { valeur: nsp, libelle: "Ne sait pas" }
+      - id: prat_eclairage_points
+        libelle: "Nombre de points lumineux extérieurs"
+        type: nombre
+        min: 0
+        max: 200
+        pas: 1
+        affichage: compteur
+        pourquoi: "Donnée utile pour dimensionner une éventuelle réduction de l'éclairage."
+      - id: prat_eclairage_extinction
+        libelle: "L'éclairage extérieur est-il éteint ou réduit la nuit ?"
+        type: bool
+        sansObjet: true
+        poids: 2
+        pourquoi: "Éteindre la nuit réduit la consommation d'énergie et protège la faune nocturne."
+        piste: { titre: "Éteindre ou réduire l'éclairage la nuit", texte: "Installer une horloge ou des détecteurs de présence pour limiter l'éclairage aux heures utiles.", effort: faible }
+        prestation: eclairage_raisonne
+      - id: prat_pollution_lumineuse
+        libelle: "Constate-t-on de la pollution lumineuse (éclairage trop fort, dirigé vers le haut, lumière très blanche) ?"
+        type: bool
+        sansObjet: true
+        poids: 2
+        pourquoi: "La lumière artificielle nocturne perturbe insectes, oiseaux et chauves-souris."
+        piste: { titre: "Limiter la pollution lumineuse", texte: "Orienter les lumières vers le sol, choisir des teintes chaudes et réduire l'intensité.", effort: moyen }
+        prestation: eclairage_raisonne
+        score: { oui: 0, partiel: 50, non: 100 }
+
+  # ───────────────────────────── PILIER 4 — CLIMAT ET CONFORT ───────────
+  - id: climat
+    libelle: "Climat et confort"
+    type: pilier
+    icone: "☀️"
+    description: "Ombrage, îlots de chaleur, végétalisation des bâtiments."
+    questions:
+      - id: clim_ombrage
+        libelle: "Les parkings et zones de pause sont-ils ombragés (arbres, pergolas) ?"
+        type: bool
+        poids: 3
+        pourquoi: "L'ombre abaisse nettement la température au sol et le confort des collaborateurs l'été."
+        piste: { titre: "Ombrager parkings et zones de pause", texte: "Planter des arbres d'ombrage ou installer des pergolas végétalisées.", effort: moyen }
+        prestation: ombrage_arbres
+      - id: clim_ilots
+        libelle: "Y a-t-il de grandes surfaces minérales exposées au soleil (îlots de chaleur) ?"
+        type: bool
+        poids: 3
+        pourquoi: "Enrobé et béton emmagasinent la chaleur et la restituent : confort dégradé et climatisation plus sollicitée."
+        piste: { titre: "Rafraîchir les surfaces minérales exposées", texte: "Végétaliser, ombrager ou remplacer les revêtements sombres par des revêtements clairs et perméables.", effort: moyen }
+        prestation: desimpermeabilisation
+        score: { oui: 0, partiel: 40, non: 100 }
+      - id: clim_vegetalisation
+        libelle: "Végétalisation des bâtiments"
+        type: choix
+        multiple: true
+        poids: 2
+        pourquoi: "Façades et toitures végétalisées isolent, rafraîchissent et retiennent l'eau de pluie."
+        piste: { titre: "Végétaliser façades ou toitures", texte: "Étudier une toiture végétalisée ou des plantes grimpantes en façade.", effort: eleve }
+        prestation: vegetalisation_batiment
+        options:
+          - { valeur: facades, libelle: "Façades végétalisées", score: 50 }
+          - { valeur: toitures, libelle: "Toitures végétalisées", score: 50 }
+          - { valeur: aucune, libelle: "Aucune", score: 0, exclusif: true }
+
+  # ───────────────────────────── PILIER 5 — SOCIAL / QVCT ───────────────
+  - id: social
+    libelle: "Usage par les collaborateurs (QVCT)"
+    libelleCourt: "Collaborateurs"
+    type: pilier
+    icone: "🧑‍🤝‍🧑"
+    description: "Les espaces extérieurs au service du bien-être des équipes."
+    questions:
+      - id: soc_espace_pause
+        libelle: "Espace de pause extérieur : équipements présents"
+        type: choix
+        multiple: true
+        poids: 3
+        pourquoi: "Un espace de pause agréable améliore le bien-être, la cohésion et l'attractivité de l'employeur."
+        piste: { titre: "Aménager un espace de pause extérieur", texte: "Installer tables, bancs et un abri ou une zone ombragée dans un coin calme et végétalisé.", effort: moyen }
+        prestation: espace_pause
+        options:
+          - { valeur: tables, libelle: "Tables", score: 35 }
+          - { valeur: bancs, libelle: "Bancs", score: 35 }
+          - { valeur: abri, libelle: "Abri / zone ombragée", score: 30 }
+          - { valeur: aucun, libelle: "Aucun espace de pause", score: 0, exclusif: true }
+      - id: soc_usage
+        libelle: "Les collaborateurs utilisent-ils les espaces verts ?"
+        type: choix
+        poids: 3
+        pourquoi: "Un espace vert inutilisé est un coût sans bénéfice : comprendre les freins permet de mieux l'aménager."
+        piste: { titre: "Donner envie d'utiliser les espaces verts", texte: "Identifier les freins (ombre, mobilier, nuisances) et agir dessus : aménagement, animations, signalétique.", effort: faible }
+        prestation: espace_pause
+        options:
+          - { valeur: jamais, libelle: "Jamais", score: 0 }
+          - { valeur: parfois, libelle: "Parfois", score: 50 }
+          - { valeur: souvent, libelle: "Souvent", score: 100 }
+          - { valeur: nsp, libelle: "Ne sait pas" }
+      - id: soc_pmr
+        libelle: "Les espaces extérieurs sont-ils accessibles aux personnes à mobilité réduite ?"
+        type: bool
+        poids: 2
+        pourquoi: "L'accessibilité est une obligation et un critère d'inclusion de la politique RSE."
+        piste: { titre: "Améliorer l'accessibilité PMR", texte: "Vérifier cheminements, pentes, revêtements et mobilier accessibles.", effort: moyen }
+        prestation: acces_pmr
+      - id: soc_potager_animations
+        libelle: "Potager, jardin partagé ou animations nature proposés ?"
+        type: choix
+        multiple: true
+        poids: 2
+        pourquoi: "Ces initiatives créent du lien entre collaborateurs et sensibilisent à la biodiversité."
+        piste: { titre: "Proposer un potager ou des animations nature", texte: "Créer un potager partagé et organiser des ateliers (hôtels à insectes, compost, ruches).", effort: moyen }
+        prestation: potager_animations
+        options:
+          - { valeur: potager, libelle: "Potager", score: 50 }
+          - { valeur: jardin_partage, libelle: "Jardin partagé", score: 50 }
+          - { valeur: animations, libelle: "Animations nature", score: 50 }
+          - { valeur: aucun, libelle: "Aucun", score: 0, exclusif: true }
+      - id: soc_mobilite
+        libelle: "Mobilité douce : équipements présents"
+        type: choix
+        multiple: true
+        poids: 2
+        pourquoi: "Les équipements vélo et électrique facilitent la mobilité bas carbone des collaborateurs."
+        piste: { titre: "Faciliter la mobilité douce", texte: "Installer un abri vélos sécurisé et étudier des bornes de recharge.", effort: moyen }
+        prestation: mobilite_douce
+        options:
+          - { valeur: abri_velos, libelle: "Abri vélos", score: 50 }
+          - { valeur: bornes, libelle: "Bornes de recharge", score: 50 }
+          - { valeur: aucun, libelle: "Aucun", score: 0, exclusif: true }
+
+  # ───────────────────────────── PILIER 6 — GOUVERNANCE ─────────────────
+  - id: gouvernance
+    libelle: "Gouvernance et ancrage territorial"
+    libelleCourt: "Gouvernance"
+    type: pilier
+    icone: "🏛️"
+    description: "Place des espaces extérieurs dans la politique RSE, achats responsables, budget."
+    questions:
+      - id: gouv_politique
+        libelle: "La biodiversité ou les espaces verts font-ils partie de la politique RSE ou de la communication ?"
+        type: bool
+        poids: 3
+        pourquoi: "Inscrire les espaces extérieurs dans la politique RSE donne un cadre, des objectifs et de la visibilité."
+        piste: { titre: "Intégrer les espaces extérieurs à la politique RSE", texte: "Définir 2 ou 3 objectifs simples sur les espaces extérieurs et les relier au rapport RSE.", effort: faible }
+        prestation: accompagnement_rse
+      - id: gouv_achats
+        libelle: "Critères RSE dans le choix des prestataires"
+        type: choix
+        multiple: true
+        poids: 3
+        pourquoi: "Des achats responsables (local, insertion, critères écologiques) renforcent l'impact social et territorial."
+        piste: { titre: "Intégrer des critères RSE dans les achats", texte: "Ajouter des critères écologiques et sociaux (local, insertion) dans le cahier des charges des prestataires.", effort: faible }
+        prestation: contrat_responsable
+        options:
+          - { valeur: achats_responsables, libelle: "Politique d'achats responsables", score: 35 }
+          - { valeur: local, libelle: "Prestataires locaux privilégiés", score: 35 }
+          - { valeur: insertion, libelle: "Entreprises d'insertion ou adaptées", score: 30 }
+          - { valeur: aucun, libelle: "Aucun critère RSE", score: 0, exclusif: true }
+      - id: gouv_budget
+        libelle: "Budget annuel dédié aux espaces extérieurs"
+        type: choix
+        cleExport: budget_annuel
+        pourquoi: "Donnée commerciale : permet de calibrer l'offre."
+        options:
+          - { valeur: moins_5k, libelle: "Moins de 5 000 €" }
+          - { valeur: de_5k_15k, libelle: "5 000 à 15 000 €" }
+          - { valeur: de_15k_40k, libelle: "15 000 à 40 000 €" }
+          - { valeur: plus_40k, libelle: "Plus de 40 000 €" }
+          - { valeur: nsp, libelle: "Ne sait pas" }
+      - id: gouv_valorisation
+        libelle: "Souhait de valoriser la démarche"
+        type: choix
+        multiple: true
+        cleExport: valorisation
+        pourquoi: "Indique le niveau d'intérêt pour un accompagnement de communication et de labellisation."
+        options:
+          - { valeur: rapport_rse, libelle: "Dans le rapport RSE" }
+          - { valeur: communication_interne, libelle: "Communication interne" }
+          - { valeur: communication_externe, libelle: "Communication externe" }
+          - { valeur: label, libelle: "Obtention d'un label" }
+          - { valeur: non, libelle: "Pas de souhait particulier", exclusif: true }
